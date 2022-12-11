@@ -84,8 +84,11 @@ fwrite(mapBroad, "interData/FHS_Broad_map.tsv", sep = '\t')
 
 #### Process Metabolon Files
 dt <- fread("sourceData/2022.0124_WHI_Metabolon_BatchNormData.txt", header = T)
+anno <- fread("sourceData/2022.0124_WHI_Metabolon_ChemicalAnnotation.txt")
+names(dt)[2:ncol(dt)] <- anno$CHEMICAL_NAME[match(names(dt)[2:ncol(dt)], anno$CHEM_ID)]
 dt[, ID := TOMID]
 dt[, TOMID := NULL]
+
 map <- fread("sourceData/2022.0124_WHI_Metabolon_ChemicalAnnotation.txt")
 map <- map[, .(CHEM_ID, LEVEL, HMDB, CHEMICAL_NAME, PLATFORM)]
 fwrite(dt, sep = '\t', "interData/WHI_Metabolon.tsv")
