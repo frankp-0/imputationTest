@@ -58,7 +58,7 @@ broadFiles <- c("19_1008_TOPMed_WHI_Broad_C18-neg_metabolomics_NONREDUNDANTonly_
                 "19_1126_TOPMed_WHI_Broad_C8-pos_metabolomics_v2_NONREDUNDANTonly_tabd.txt",
                 "19_1211_TOPMed_WHI_Broad_HILIC-pos_metabolomics_NONREDUNDANTonly_tabd.txt",
                 "20_0226_TOPMed_WHI_BIDMC_Amide-neg_metabolomics_tabd.txt")
-broadFiles <- paste0("sourceData/", broadFiles)
+broadFiles <- paste0("sourceData/WHI_Metabolomics/", broadFiles)
 
 broadAssays <- c("C18_neg", "C8_pos", "HILIC_pos", "Amide_neg")
 
@@ -73,10 +73,10 @@ for (i in 1:4){
 }
 
 #### Process Metabolon Files
-dt <- fread("sourceData/2022.0124_WHI_Metabolon_BatchNormData.txt", header = T)
+dt <- fread("sourceData/WHI_Metabolomics/2022.0124_WHI_Metabolon_BatchNormData.txt", header = T)
 dt[, ID := TOMID]
 dt[, TOMID := NULL]
-mapping <- fread("sourceData/2022.0124_WHI_Metabolon_ChemicalAnnotation.txt")
+mapping <- fread("sourceData/WHI_Metabolomics/2022.0124_WHI_Metabolon_ChemicalAnnotation.txt")
 mapping <- mapping[, .(CHEM_ID, LEVEL, HMDB, CHEMICAL_NAME, PLATFORM)]
 fwrite(dt, sep = '\t', "interData/WHI_Metabolon.tsv")
 fwrite(mapping, sep = '\t', "interData/WHI_Metabolon_mapping.tsv")
