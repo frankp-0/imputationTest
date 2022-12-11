@@ -42,15 +42,17 @@ transposeData <- function(dt){
 cleanBroad <- function(file){
   dt <- stripHeader(file)
   # remove internal standards
-  dt <- dt[!grepl("internal", HMDB_ID), ]
+  dt <- dt[!grepl("Internal", HMDB_ID), ]
   # format missing HMDB IDs as NA
   dt[HMDB_ID == "", "HMDB_ID"] <- NA
   # make data frame with metabolite information
   dt[, Assignment := `Assignment_certainty (1=match to single HMDB ID, 2=match to more than one HMDB ID)`]
-  mapping <- dt[, .(Metabolite, HMDB_ID, Assignment)]
-  # assign arbitrary name to unnamed metabolites
+  map <- dt[, .(Metabolite, HMDB_ID, Assignment)]
   dt %<>% transposeData()
-  return(list(mapping = mapping, dt = dt))
+  # assign arbitrary name to unnamed metabolites
+  names(dt) <- make.unique(names(dt))
+  map$Metabolite <- make.unique(map$Metabolite)
+  return(list(map = map, dt = dt))
 }
 
 #### Process Broad Files
@@ -60,23 +62,31 @@ broadFiles <- c("19_0904_TOPMed_FHS_Broad_C18-neg_metabolomics_NONREDUNDANTonly_
                "20_0226_TOPMed_FHS_BIDMC_Amide-neg_metabolomics_tabd.txt")
 broadFiles <- paste0("sourceData/", broadFiles)
 
-broadAssays <- c("C18_neg", "C8_pos", "HILIC_pos", "Amide_neg")
+broadPlatforms <- c("C18_neg", "C8_pos", "HILIC_pos", "Amide_neg")
 
+# clean data for each platform
 for (i in 1:4){
   cleanedData <- cleanBroad(broadFiles[i])
-  fwrite(cleanedData$dt,
-         sep = '\t',
-         file = paste0("interData/", "FHS_Broad_", broadAssays[i], ".tsv"))
-  fwrite(cleanedData$mapping,
-         sep = '\t',
-         file = paste0("interData/", "FHS_Broad_", broadAssays[i], "_mapping.tsv"))
+  cleanedData$map$Platform <- broadPlatforms[i]
+  names(cleanedData$dt)[startsWith(names(cleanedData$dt), ".")] <- paste0(".", broadPlatforms[i], names(cleanedData$dt)[startsWith(names(cleanedData$dt), ".")])
+  cleanedData$map$Metabolite[startsWith(cleanedData$map$Metabolite, ".")] <- paste0(".", broadPlatforms[i], cleanedData$map$Metabolite[startsWith(cleanedData$map$Metabolite, ".")])
+  assign(broadPlatforms[i], cleanedData$dt)
+  assign(paste0(broadPlatforms[i], "_map"), cleanedData$map)
 }
+
+# combine Broad data across platforms
+dtBroad <- Reduce(function(x, y) merge(x, y, by="ID"), list(C18_neg, C8_pos, HILIC_pos, Amide_neg))
+mapBroad <- rbind(C18_neg_map, C8_pos_map, HILIC_pos_map, Amide_neg_map)
+
+# write Broad data
+fwrite(dtBroad, "interData/FHS_Broad.tsv", sep = '\t')
+fwrite(mapBroad, "interData/FHS_Broad_map.tsv", sep = '\t')
 
 #### Process Metabolon Files
 dt <- fread("sourceData/2022.0124_WHI_Metabolon_BatchNormData.txt", header = T)
 dt[, ID := TOMID]
 dt[, TOMID := NULL]
-mapping <- fread("sourceData/2022.0124_WHI_Metabolon_ChemicalAnnotation.txt")
-mapping <- mapping[, .(CHEM_ID, LEVEL, HMDB, CHEMICAL_NAME, PLATFORM)]
+map <- fread("sourceData/2022.0124_WHI_Metabolon_ChemicalAnnotation.txt")
+map <- map[, .(CHEM_ID, LEVEL, HMDB, CHEMICAL_NAME, PLATFORM)]
 fwrite(dt, sep = '\t', "interData/WHI_Metabolon.tsv")
-fwrite(mapping, sep = '\t', "interData/WHI_Metabolon_mapping.tsv")
+fwrite(map, sep = '\t', "interData/WHI_Metabolon_map.tsv")

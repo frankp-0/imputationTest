@@ -1,14 +1,8 @@
 rule all:
     input:
-        "interData/FHS_Broad_Amide_neg_mapping.tsv",
-        "interData/FHS_Broad_Amide_neg.tsv",
-        "interData/FHS_Broad_C18_neg_mapping.tsv",
-        "interData/FHS_Broad_C18_neg.tsv",
-        "interData/FHS_Broad_C8_pos_mapping.tsv",
-        "interData/FHS_Broad_C8_pos.tsv",
-        "interData/FHS_Broad_HILIC_pos_mapping.tsv",
-        "interData/FHS_Broad_HILIC_pos.tsv",
-        "interData/WHI_Metabolon_mapping.tsv",
+        "interData/FHS_Broad.tsv",
+        "interData/FHS_Broad_map.tsv",
+        "interData/WHI_Metabolon_map.tsv",
         "interData/WHI_Metabolon.tsv"
 
 rule linkSourceData:
@@ -38,15 +32,9 @@ rule cleanMetabolomicsData:
         "sourceData/2022.0124_WHI_Metabolon_ChemicalAnnotation.txt",
         "R/cleanSourceData.R"
     output:
-        "interData/FHS_Broad_Amide_neg_mapping.tsv",
-        "interData/FHS_Broad_Amide_neg.tsv",
-        "interData/FHS_Broad_C18_neg_mapping.tsv",
-        "interData/FHS_Broad_C18_neg.tsv",
-        "interData/FHS_Broad_C8_pos_mapping.tsv",
-        "interData/FHS_Broad_C8_pos.tsv",
-        "interData/FHS_Broad_HILIC_pos_mapping.tsv",
-        "interData/FHS_Broad_HILIC_pos.tsv",
-        "interData/WHI_Metabolon_mapping.tsv",
+        "interData/FHS_Broad.tsv",
+        "interData/FHS_Broad_map.tsv",
+        "interData/WHI_Metabolon_map.tsv",
         "interData/WHI_Metabolon.tsv"
     shell:
         """
