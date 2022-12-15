@@ -1,11 +1,9 @@
+cohort = ["FHS_Broad", "WHI_Metabolon"]
+method = ["zero", "min", "median", "qrilc", "mai", "rf"]
+
 rule all:
     input:
-        "interData/FHS_Broad.tsv",
-        "interData/FHS_Broad_map.tsv",
-        "interData/WHI_Metabolon_map.tsv",
-        "interData/WHI_Metabolon.tsv",
-        "interData/FHS_Broad_Pheno.tsv",
-        "interData/WHI_Metabolon_Pheno.tsv"
+        expand("interData/{cohort}_{method}.tsv.gz", cohort = cohort, method = method),
 
 rule linkSourceData:
     input:
@@ -56,4 +54,19 @@ rule cleanPhenotypeData:
     shell:
         """
         Rscript R/cleanPhenotypeData.R
+        """
+
+rule impute:
+    input:
+        "R/impute.R",
+        data="interData/{cohort}.tsv"
+    output:
+        "interData/{cohort}_{method}.tsv.gz"
+    shell:
+        """
+        Rscript R/impute.R \
+            --dtFile {input.data} \
+            --method {wildcards.method} \
+            --ncores 10 \
+            --outFile {output}
         """
