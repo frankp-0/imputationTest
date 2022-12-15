@@ -29,11 +29,11 @@ doImpute <- function(dtFile, method, ncores){
 
                                         # imputation
   if (method == "zero"){
-    dtImp <- apply(dt, 1, function(x) {x[is.na(x)] <- 0; x})
+    dtImp <- apply(dt, 2, function(x) {x[is.na(x)] <- 0; x})
   } else if(method == "min"){
-    dtImp <- apply(dt, 1, function(x) {x[is.na(x)] <- min(x, na.rm = T)/2; x})
+    dtImp <- apply(dt, 2, function(x) {x[is.na(x)] <- min(x, na.rm = T)/2; x})
   } else if (method == "median"){
-    dtImp <- apply(dt, 1, function(x) {x[is.na(x)] <- median(x, na.rm = T)/2; x})
+    dtImp <- apply(dt, 2, function(x) {x[is.na(x)] <- median(x, na.rm = T)/2; x})
   } else if(method == "qrilc"){
     dtImp <- data.table(t(impute.QRILC(dt)[[1]]))
   } else if(method == "mai"){
@@ -43,7 +43,7 @@ doImpute <- function(dtFile, method, ncores){
     dtImp <- missForest(dt, parallelize = "variables", verbose = TRUE)
   }
                                         # remove metabolites with < 1% missingness
-  dtImp <- data.table(t(dtImp))[, .SD, .SDcols = toKeep]
+  dtImp <- data.table(dtImp)[, .SD, .SDcols = toKeep]
   dtImp$ID <- ID
   return(dtImp)
 }
