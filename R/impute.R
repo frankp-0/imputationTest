@@ -40,7 +40,7 @@ doImpute <- function(dtFile, method, ncores){
     dtImp <- data.table(MAI(as.matrix(dt))[["Imputed_data"]])
   } else if (method == "rf"){
     registerDoParallel(ncores-1)
-    dtImp <- missForest(dt, parallelize = "variables", verbose = TRUE)
+    dtImp <- missForest(dt, parallelize = "variables", verbose = TRUE)$ximp
   }
                                         # remove metabolites with < 1% missingness
   dtImp <- data.table(dtImp)[, .SD, .SDcols = toKeep]
