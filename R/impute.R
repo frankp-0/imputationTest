@@ -37,8 +37,8 @@ doImpute <- function(dtFile, method, ncores){
   } else if(method == "qrilc"){
     dtImp <- data.table(t(impute.QRILC(dt)[[1]]))
   } else if(method == "mai"){
-    dtImp <- data.table(MAI(as.matrix(dt))[["Imputed_data"]])
-  } else if (method == "rf"){
+#    dtImp <- data.table(MAI(as.matrix(dt))[["Imputed_data"]])
+#  } else if (method == "rf"){
     registerDoParallel(ncores-1)
     dtImp <- missForest(dt, parallelize = "variables", verbose = TRUE)$ximp
   }

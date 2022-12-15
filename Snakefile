@@ -1,5 +1,6 @@
 cohort = ["FHS_Broad", "WHI_Metabolon"]
-method = ["zero", "min", "median", "qrilc", "mai", "rf"]
+#method = ["zero", "min", "median", "qrilc", "mai", "rf"]
+method = ["zero", "min", "median", "qrilc", "rf"]
 
 rule all:
     input:
