@@ -78,6 +78,10 @@ for (i in 1:4){
 dtBroad <- Reduce(function(x, y) merge(x, y, by="ID"), list(C18_neg, C8_pos, HILIC_pos, Amide_neg))
 mapBroad <- rbind(C18_neg_map, C8_pos_map, HILIC_pos_map, Amide_neg_map)
 
+# make metabolite names unique
+names(dtBroad) <- make.unique(names(dtBroad))
+mapBroad$Metabolite <- make.unique(mapBroad$Metabolite)
+
 # write Broad data
 fwrite(dtBroad, "interData/FHS_Broad.tsv", sep = '\t')
 fwrite(mapBroad, "interData/FHS_Broad_map.tsv", sep = '\t')
