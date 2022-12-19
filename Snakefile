@@ -4,6 +4,7 @@ method = ["zero", "min", "median", "qrilc", "rf"]
 rule all:
     input:
         expand("interData/{cohort}_{method}.tsv.gz", cohort = cohort, method = method),
+        expand("interData/{cohort}_Pheno.tsv", cohort = cohort)
 
 rule linkSourceData:
     input:
