@@ -22,6 +22,8 @@ doImpute <- function(dtFile, method, ncores){
   dt <- fread(dtFile)
   ID <- dt$ID
   dt[, ID := NULL]
+                                        # remote unnamed metabolites (applicable for Broad data)
+  dt <- dt[, .SD, .SDcols = !startsWith(names(dt), ".")]
                                         # remove metabolites with > 50% missingness
   dt <- dt[, .SD, .SDcols = colMeans(is.na(dt)) < 0.5]
                                         # index metabolites with < 1% missingness
