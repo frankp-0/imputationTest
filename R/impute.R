@@ -3,8 +3,8 @@ library(magrittr)
 library(imputeLCMD)
 library(optparse)
 library(MAI)
-library(missForest)
 library(doParallel)
+library(missRanger)
 
 option_list <- list(
   make_option("--dtFile", type = "character"),
@@ -35,12 +35,15 @@ doImpute <- function(dtFile, method, ncores){
   } else if (method == "median"){
     dtImp <- apply(dt, 2, function(x) {x[is.na(x)] <- median(x, na.rm = T)/2; x})
   } else if(method == "qrilc"){
-    dtImp <- data.table(t(impute.QRILC(dt)[[1]]))
+    dtImp <- data.table(impute.QRILC(dt)[[1]])
   } else if(method == "mai"){
-#    dtImp <- data.table(MAI(as.matrix(dt))[["Imputed_data"]])
-#  } else if (method == "rf"){
-    registerDoParallel(ncores-1)
-    dtImp <- missForest(dt, parallelize = "variables", verbose = TRUE)$ximp
+    dtImp <- data.table(MAI(as.matrix(dt))[["Imputed_data"]])
+  } else if (method == "rf"){
+    registerDoParallel(cores = ncores-1)
+    met.names <- names(dt)
+    names(dt) <- make.names(names(dt))
+    dtImp <- missRanger(dt, num.trees = 20, num.threads = ncores-1, verbose = TRUE)
+    names(dtImp) <- met.names
   }
                                         # remove metabolites with < 1% missingness
   dtImp <- data.table(dtImp)[, .SD, .SDcols = toKeep]

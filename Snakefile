@@ -1,5 +1,4 @@
 cohort = ["FHS_Broad", "WHI_Metabolon"]
-#method = ["zero", "min", "median", "qrilc", "mai", "rf"]
 method = ["zero", "min", "median", "qrilc", "rf"]
 
 rule all:
@@ -19,6 +18,10 @@ rule linkSourceData:
         "sourceData/omics_sample_metadata_FHS_metabolomics.tab",
         "sourceData/SCT-metabolomics_ID_map_age_LauraRaffield_2022-08-02.csv",
         "sourceData/topmed_dcc_harmonized_demographic_v4.txt"
+    threads: 1
+    resources:
+        mem=500,
+        time=10
     shell:
         """
         bash src/getData.sh
@@ -38,6 +41,10 @@ rule cleanMetaboliteData:
         "interData/FHS_Broad_map.tsv",
         "interData/WHI_Metabolon_map.tsv",
         "interData/WHI_Metabolon.tsv"
+    threads: 1
+    resources:
+        mem=2000,
+        time=480
     shell:
         """
         Rscript R/cleanMetaboliteData.R
@@ -52,6 +59,10 @@ rule cleanPhenotypeData:
     output:
         "interData/FHS_Broad_Pheno.tsv",
         "interData/WHI_Metabolon_Pheno.tsv"
+    threads: 1
+    resources:
+        mem=4000,
+        time=480
     shell:
         """
         Rscript R/cleanPhenotypeData.R
@@ -63,11 +74,14 @@ rule impute:
         data="interData/{cohort}.tsv"
     output:
         "interData/{cohort}_{method}.tsv.gz"
+    resources:
+        mem=150000,
+        time=1-0
     shell:
         """
         Rscript R/impute.R \
             --dtFile {input.data} \
             --method {wildcards.method} \
-            --ncores 10 \
+            --ncores 50 \
             --outFile {output}
         """

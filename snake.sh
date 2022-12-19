@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
-#SBATCH --time=1-0
+#SBATCH --time=3-0
 
 module load python
 module load r
-snakemake -j 10 --cluster "sbatch --cpus-per-task=10 --mem=30G --time=1-0"
+snakemake -j 10 --cluster "sbatch --cpus-per-task=50 --mem=150G --time=3-0"
